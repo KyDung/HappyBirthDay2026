@@ -101,7 +101,7 @@ renderer.shadowMap.enabled = !isMobile;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.92;
+renderer.toneMappingExposure = 1;
 
 let composer = null;
 if (usePostProcessing) {
@@ -110,9 +110,9 @@ if (usePostProcessing) {
   composer.addPass(
     new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
-      0.36,
-      0.62,
-      0.72,
+      0.48,
+      0.58,
+      0.7,
     ),
   );
   composer.addPass(new OutputPass());
@@ -179,6 +179,14 @@ function addLights() {
   const roseLight = new THREE.PointLight(0xe86c98, 5, 14, 2);
   roseLight.position.set(2.5, -1, 3.5);
   scene.add(roseLight);
+
+  const pearlFill = new THREE.PointLight(0xffefd1, 4.5, 18, 2);
+  pearlFill.position.set(-3.5, 2.2, 6.5);
+  scene.add(pearlFill);
+
+  const glassAura = new THREE.PointLight(0x8be8dc, 3.4, 15, 2);
+  glassAura.position.set(-2.8, 4.6, 1.5);
+  scene.add(glassAura);
 }
 
 function createStars() {
@@ -294,28 +302,50 @@ function createBase() {
 function createGlassGlobe() {
   const widthSegments = isMobile ? 36 : 64;
   const heightSegments = isMobile ? 28 : 48;
+  const details = new THREE.Group();
+  musicBox.add(details);
+
+  const innerGlow = new THREE.Mesh(
+    new THREE.SphereGeometry(3.08, widthSegments, heightSegments),
+    new THREE.MeshBasicMaterial({
+      color: 0xb9f4e7,
+      transparent: true,
+      opacity: 0.045,
+      side: THREE.BackSide,
+      depthWrite: false,
+    }),
+  );
+  innerGlow.renderOrder = 2;
+  details.add(innerGlow);
+
   const glass = new THREE.Mesh(
     new THREE.SphereGeometry(3.15, widthSegments, heightSegments),
     new THREE.MeshPhysicalMaterial({
       color: palette.glass,
-      roughness: 0.05,
+      roughness: 0.08,
       metalness: 0,
       transparent: true,
-      opacity: 0.14,
-      transmission: 0,
-      thickness: 0.35,
+      opacity: 0.12,
+      transmission: isMobile ? 0 : 0.16,
+      thickness: 0.46,
       ior: 1.34,
+      clearcoat: 1,
+      clearcoatRoughness: 0.08,
+      iridescence: isMobile ? 0 : 0.12,
+      iridescenceIOR: 1.3,
+      iridescenceThicknessRange: [120, 360],
+      specularIntensity: 1,
       side: THREE.DoubleSide,
       depthWrite: false,
     }),
   );
   glass.renderOrder = 3;
-  musicBox.add(glass);
+  details.add(glass);
 
   const rimMaterial = new THREE.MeshBasicMaterial({
     color: 0xe5fff5,
     transparent: true,
-    opacity: 0.24,
+    opacity: 0.31,
   });
   const equator = new THREE.Mesh(
     new THREE.TorusGeometry(3.16, 0.02, 8, isMobile ? 48 : 80),
@@ -323,25 +353,68 @@ function createGlassGlobe() {
   );
   equator.rotation.x = Math.PI / 2;
   equator.renderOrder = 4;
-  musicBox.add(equator);
+  details.add(equator);
 
   const verticalRing = equator.clone();
   verticalRing.rotation.x = 0;
   verticalRing.rotation.z = Math.PI * 0.12;
-  musicBox.add(verticalRing);
+  details.add(verticalRing);
+
+  const outerRim = new THREE.Mesh(
+    new THREE.TorusGeometry(3.17, 0.012, 8, isMobile ? 48 : 96),
+    new THREE.MeshBasicMaterial({
+      color: 0x9be9dc,
+      transparent: true,
+      opacity: 0.24,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
+  );
+  outerRim.rotation.z = -Math.PI * 0.12;
+  outerRim.renderOrder = 4;
+  details.add(outerRim);
+
+  const reflectionMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.48,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
 
   const highlight = new THREE.Mesh(
     new THREE.SphereGeometry(0.28, 20, 20),
-    new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.42,
-    }),
+    reflectionMaterial,
   );
-  highlight.position.set(-1.27, 1.4, 2.45);
+  highlight.position.set(-1.27, 1.4, 2.7);
   highlight.rotation.z = -Math.PI / 6;
   highlight.scale.set(0.38, 1.35, 0.12);
-  musicBox.add(highlight);
+  highlight.renderOrder = 5;
+  highlight.userData.baseOpacity = reflectionMaterial.opacity;
+  details.add(highlight);
+
+  const sideHighlight = new THREE.Mesh(
+    new THREE.SphereGeometry(0.22, 16, 16),
+    reflectionMaterial.clone(),
+  );
+  sideHighlight.position.set(-1.78, 0.22, 2.58);
+  sideHighlight.rotation.z = -Math.PI / 7;
+  sideHighlight.scale.set(0.18, 1.05, 0.06);
+  sideHighlight.renderOrder = 5;
+  sideHighlight.userData.baseOpacity = sideHighlight.material.opacity;
+  details.add(sideHighlight);
+
+  const glint = new THREE.Mesh(
+    new THREE.SphereGeometry(0.16, 16, 16),
+    reflectionMaterial.clone(),
+  );
+  glint.position.set(1.58, 1.52, 2.63);
+  glint.scale.set(0.14, 0.52, 0.05);
+  glint.renderOrder = 5;
+  glint.userData.baseOpacity = glint.material.opacity;
+  details.add(glint);
+
+  return { innerGlow, highlight, sideHighlight, glint, outerRim };
 }
 
 function createSparkles() {
@@ -771,7 +844,7 @@ const sparkles = createSparkles();
 const finalHeart = createFinalHeart();
 addLights();
 createBase();
-createGlassGlobe();
+const glassDetails = createGlassGlobe();
 createLetters();
 loadModel();
 
@@ -829,6 +902,17 @@ function animate(frameTime = 0) {
   });
 
   updateLetterHitTargets();
+
+  const glassPulse = 0.84 + Math.sin(elapsed * 1.15) * 0.16 * drift;
+  glassDetails.innerGlow.material.opacity = 0.04 + glassPulse * 0.012;
+  [glassDetails.highlight, glassDetails.sideHighlight, glassDetails.glint].forEach(
+    (reflection, index) => {
+      reflection.material.opacity =
+        reflection.userData.baseOpacity *
+        (0.8 + Math.sin(elapsed * 1.25 + index * 1.7) * 0.14 * drift);
+    },
+  );
+  glassDetails.outerRim.material.opacity = 0.19 + glassPulse * 0.08;
 
   sparkles.children.forEach((sparkle) => {
     const pulse =
