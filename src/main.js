@@ -44,6 +44,7 @@ const MESSAGES = [
 
 const canvas = document.querySelector("#scene");
 const letterHitLayer = document.querySelector("#letterHitLayer");
+const resetButton = document.querySelector("#resetLetters");
 const startScreen = document.querySelector("#startScreen");
 const startCopy = document.querySelector("#startCopy");
 const startButton = document.querySelector("#startButton");
@@ -54,6 +55,7 @@ const passwordInput = document.querySelector("#passwordInput");
 const passwordError = document.querySelector("#passwordError");
 const letterPanel = document.querySelector("#letterPanel");
 const closeLetter = document.querySelector("#closeLetter");
+const closeFinal = document.querySelector("#closeFinal");
 const letterNumber = document.querySelector("#letterNumber");
 const letterTitle = document.querySelector("#letterTitle");
 const letterBody = document.querySelector("#letterBody");
@@ -591,29 +593,6 @@ function createLetters() {
   });
 }
 
-function createFinalHeart() {
-  const heart = new THREE.Group();
-  heart.visible = false;
-  heart.position.set(0, 0.15, -1.9);
-  const dotGeometry = new THREE.SphereGeometry(0.045, 10, 10);
-  const dotMaterial = new THREE.MeshBasicMaterial({ color: 0xffc27e });
-  for (let step = 0; step < 95; step += 1) {
-    const t = (step / 94) * Math.PI * 2;
-    const x = 0.13 * Math.pow(Math.sin(t), 3);
-    const y =
-      0.1 *
-      (13 * Math.cos(t) -
-        5 * Math.cos(2 * t) -
-        2 * Math.cos(3 * t) -
-        Math.cos(4 * t));
-    const dot = new THREE.Mesh(dotGeometry, dotMaterial);
-    dot.position.set(x * 11.2, y * 0.72, THREE.MathUtils.randFloatSpread(0.18));
-    heart.add(dot);
-  }
-  world.add(heart);
-  return heart;
-}
-
 function frameAndPlaceModel(object) {
   const box = new THREE.Box3().setFromObject(object);
   const size = box.getSize(new THREE.Vector3());
@@ -700,7 +679,8 @@ function openMessage(index) {
 
     if (openedLetters.size === MESSAGES.length) {
       finalNoteReady = true;
-      sceneHint.textContent = "Đọc lá thư cuối rồi chạm ra ngoài để xem điều bất ngờ nhé.";
+      sceneHint.textContent =
+        "Đọc lá thư cuối rồi chạm ra ngoài để xem điều bất ngờ nhé.";
     }
   }
 }
@@ -713,12 +693,41 @@ function closeMessage() {
   if (finalNoteReady && !finalNoteShown) {
     finalNoteShown = true;
     window.setTimeout(() => {
-      finalHeart.visible = true;
       finalNote.classList.add("is-open");
       finalNote.setAttribute("aria-hidden", "false");
-      sceneHint.textContent = "Anh hy vọng em đã mỉm cười một chút.";
+      resetButton.hidden = false;
+      resetButton.classList.add("is-visible");
+      sceneHint.textContent = "Anh hy vọng ní sẽ thích =)).";
     }, 300);
   }
+}
+
+function closeFinalNote() {
+  finalNote.classList.remove("is-open");
+  finalNote.setAttribute("aria-hidden", "true");
+}
+
+function resetLetters() {
+  finalNoteReady = false;
+  finalNoteShown = false;
+  closeMessage();
+  closeFinalNote();
+  resetButton.hidden = true;
+  resetButton.classList.remove("is-visible");
+  openedLetters.clear();
+  updateOpenedCount();
+
+  letters.forEach((letter, index) => {
+    letter.userData.opened = false;
+    letter.material.map.dispose();
+    letter.material.map = makeLetterTexture(index);
+    letter.material.color.set(0xfff5df);
+    letter.children[0].material.color.set(0xe9b66c);
+    letter.children[0].material.opacity = 0.16;
+    letter.material.needsUpdate = true;
+  });
+
+  sceneHint.textContent = "Chạm vào những phong thư đang bay quanh hộp nhạc";
 }
 
 function setPointer(event) {
@@ -868,7 +877,6 @@ function updateLetterHitTargets() {
 
 const starfield = createStars();
 const sparkles = createSparkles();
-const finalHeart = createFinalHeart();
 addLights();
 createBase();
 const glassDetails = createGlassGlobe();
@@ -881,6 +889,8 @@ passwordInput.addEventListener("input", () => {
   passwordError.textContent = "";
 });
 closeLetter.addEventListener("click", closeMessage);
+closeFinal.addEventListener("click", closeFinalNote);
+resetButton.addEventListener("click", resetLetters);
 canvas.addEventListener("click", handleTap);
 canvas.addEventListener("pointermove", (event) => {
   if (!running) return;
@@ -936,13 +946,15 @@ function animate(frameTime = 0) {
 
   const glassPulse = 0.84 + Math.sin(elapsed * 1.15) * 0.16 * drift;
   glassDetails.innerGlow.material.opacity = 0.04 + glassPulse * 0.012;
-  [glassDetails.highlight, glassDetails.sideHighlight, glassDetails.glint].forEach(
-    (reflection, index) => {
-      reflection.material.opacity =
-        reflection.userData.baseOpacity *
-        (0.8 + Math.sin(elapsed * 1.25 + index * 1.7) * 0.14 * drift);
-    },
-  );
+  [
+    glassDetails.highlight,
+    glassDetails.sideHighlight,
+    glassDetails.glint,
+  ].forEach((reflection, index) => {
+    reflection.material.opacity =
+      reflection.userData.baseOpacity *
+      (0.8 + Math.sin(elapsed * 1.25 + index * 1.7) * 0.14 * drift);
+  });
   glassDetails.outerRim.material.opacity = 0.19 + glassPulse * 0.08;
 
   sparkles.children.forEach((sparkle) => {
@@ -952,14 +964,6 @@ function animate(frameTime = 0) {
         0.28;
     sparkle.scale.setScalar(pulse);
   });
-
-  if (finalHeart.visible) {
-    finalHeart.rotation.y = Math.sin(elapsed * 0.36) * 0.22;
-    finalHeart.children.forEach((dot, index) => {
-      const pulse = 0.75 + Math.sin(elapsed * 2.4 + index * 0.21) * 0.25;
-      dot.scale.setScalar(pulse);
-    });
-  }
 
   if (composer) composer.render();
   else renderer.render(scene, camera);

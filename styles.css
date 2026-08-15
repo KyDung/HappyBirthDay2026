@@ -62,6 +62,40 @@ button {
   pointer-events: auto;
 }
 
+.reset-button {
+  position: fixed;
+  z-index: 4;
+  top: 66px;
+  right: clamp(22px, 4vw, 60px);
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(233, 200, 165, 0.42);
+  border-radius: 50%;
+  background: rgba(20, 13, 25, 0.82);
+  color: #f6d2a1;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-size: 22px;
+  line-height: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.reset-button.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.reset-button:hover,
+.reset-button:focus-visible {
+  transform: rotate(-18deg);
+  outline: 1px solid rgba(255, 222, 168, 0.9);
+  outline-offset: 3px;
+}
+
 .grain {
   position: fixed;
   z-index: 3;
@@ -386,6 +420,7 @@ button {
 
 .final-note.is-open {
   opacity: 1;
+  pointer-events: auto;
   transform: translateY(-50%) translateX(0);
 }
 
@@ -405,6 +440,10 @@ button {
 }
 
 @media (max-width: 640px) {
+  .reset-button {
+    top: 58px;
+  }
+
   .letter-hit-target {
     width: 70px;
     height: 92px;
