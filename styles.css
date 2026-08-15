@@ -396,8 +396,8 @@ button {
 
 @media (max-width: 640px) {
   .letter-hit-target {
-    width: 74px;
-    height: 98px;
+    width: 70px;
+    height: 92px;
   }
 
   .topbar {

@@ -64,7 +64,18 @@ const finalNote = document.querySelector("#finalNote");
 const sceneHint = document.querySelector("#sceneHint");
 
 const BIRTHDAY_DISPLAY = "16 tháng 8, 2026";
-const VALID_PASSWORDS = new Set(["16082004", "16802004"]);
+const VALID_PASSWORDS = new Set(["16082004", "16802004", "1682004"]);
+
+const MOBILE_LETTER_POSITIONS = [
+  [-1.16, 2.3, -0.15],
+  [1.18, 2.32, -0.05],
+  [-2.48, 1.18, 0.18],
+  [2.5, 1.08, 0.25],
+  [-2.5, -0.42, 0.34],
+  [2.52, -0.3, 0.28],
+  [-1.82, -1.28, -0.05],
+  [1.87, -1.28, -0.07],
+];
 
 messageCount.textContent = MESSAGES.length;
 today.textContent = BIRTHDAY_DISPLAY;
@@ -541,14 +552,10 @@ function createLetters() {
     hitArea.position.z = 0.035;
     hitArea.userData.index = index;
     envelope.add(hitArea);
-    const angle = (index / MESSAGES.length) * Math.PI * 2 + 0.35;
     if (isMobile) {
-      envelope.position.set(
-        Math.cos(angle) * 2.48,
-        Math.sin(angle) * 1.5 + 0.55,
-        Math.sin(angle) * 0.34 - 0.25,
-      );
+      envelope.position.fromArray(MOBILE_LETTER_POSITIONS[index]);
     } else {
+      const angle = (index / MESSAGES.length) * Math.PI * 2 + 0.35;
       const radius = index % 2 === 0 ? 5.15 : 6.1;
       envelope.position.set(
         Math.cos(angle) * radius,
@@ -559,7 +566,7 @@ function createLetters() {
     envelope.userData = {
       index,
       base: envelope.position.clone(),
-      baseScale: isMobile ? 0.86 : 1,
+      baseScale: isMobile ? 0.8 : 1,
       phase: index * 0.8,
       opened: false,
     };
