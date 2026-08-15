@@ -395,6 +395,11 @@ button {
 }
 
 @media (max-width: 640px) {
+  .letter-hit-target {
+    width: 74px;
+    height: 98px;
+  }
+
   .topbar {
     padding-top: 20px;
   }

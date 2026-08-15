@@ -542,15 +542,24 @@ function createLetters() {
     hitArea.userData.index = index;
     envelope.add(hitArea);
     const angle = (index / MESSAGES.length) * Math.PI * 2 + 0.35;
-    const radius = index % 2 === 0 ? 5.15 : 6.1;
-    envelope.position.set(
-      Math.cos(angle) * radius,
-      Math.sin(angle * 1.8) * 1.72 + 0.3,
-      Math.sin(angle) * 1.1 - 0.7,
-    );
+    if (isMobile) {
+      envelope.position.set(
+        Math.cos(angle) * 2.48,
+        Math.sin(angle) * 1.5 + 0.55,
+        Math.sin(angle) * 0.34 - 0.25,
+      );
+    } else {
+      const radius = index % 2 === 0 ? 5.15 : 6.1;
+      envelope.position.set(
+        Math.cos(angle) * radius,
+        Math.sin(angle * 1.8) * 1.72 + 0.3,
+        Math.sin(angle) * 1.1 - 0.7,
+      );
+    }
     envelope.userData = {
       index,
       base: envelope.position.clone(),
+      baseScale: isMobile ? 0.86 : 1,
       phase: index * 0.8,
       opened: false,
     };
@@ -893,12 +902,12 @@ function animate(frameTime = 0) {
   }
 
   letters.forEach((letter, index) => {
-    const { base, phase, opened } = letter.userData;
+    const { base, baseScale, phase, opened } = letter.userData;
     const floatStrength = opened ? 0.09 : 0.17;
     letter.position.y =
       base.y + Math.sin(elapsed * 0.9 + phase) * floatStrength * drift;
     letter.lookAt(camera.position);
-    letter.scale.setScalar(opened ? 0.9 : 1);
+    letter.scale.setScalar((opened ? 0.9 : 1) * baseScale);
   });
 
   updateLetterHitTargets();
