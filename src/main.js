@@ -149,6 +149,8 @@ const clock = new THREE.Clock();
 const openedLetters = new Set();
 let running = false;
 let activeMessage = -1;
+let finalNoteReady = false;
+let finalNoteShown = false;
 const backgroundMusic = new Audio("./music_bg.mp3");
 backgroundMusic.loop = true;
 backgroundMusic.preload = "auto";
@@ -697,13 +699,8 @@ function openMessage(index) {
     updateOpenedCount();
 
     if (openedLetters.size === MESSAGES.length) {
-      setTimeout(() => {
-        closeMessage();
-        finalHeart.visible = true;
-        finalNote.classList.add("is-open");
-        finalNote.setAttribute("aria-hidden", "false");
-        sceneHint.textContent = "Anh hy vọng em đã mỉm cười một chút.";
-      }, 350);
+      finalNoteReady = true;
+      sceneHint.textContent = "Đọc lá thư cuối rồi chạm ra ngoài để xem điều bất ngờ nhé.";
     }
   }
 }
@@ -712,6 +709,16 @@ function closeMessage() {
   activeMessage = -1;
   letterPanel.classList.remove("is-open");
   letterPanel.setAttribute("aria-hidden", "true");
+
+  if (finalNoteReady && !finalNoteShown) {
+    finalNoteShown = true;
+    window.setTimeout(() => {
+      finalHeart.visible = true;
+      finalNote.classList.add("is-open");
+      finalNote.setAttribute("aria-hidden", "false");
+      sceneHint.textContent = "Anh hy vọng em đã mỉm cười một chút.";
+    }, 300);
+  }
 }
 
 function setPointer(event) {
