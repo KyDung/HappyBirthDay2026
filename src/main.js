@@ -67,14 +67,14 @@ const BIRTHDAY_DISPLAY = "16 tháng 8, 2026";
 const VALID_PASSWORDS = new Set(["16082004", "16802004", "1682004"]);
 
 const MOBILE_LETTER_LAYOUT = [
-  { position: [-1.55, 1.75, 1.15], scale: 0.84, orbit: [0.1, 0.16] },
-  { position: [1.55, 1.45, -0.8], scale: 0.68, orbit: [0.08, 0.12] },
-  { position: [-2.15, 0.55, -1.05], scale: 0.66, orbit: [0.1, 0.15] },
-  { position: [2.18, 0.28, 1.1], scale: 0.86, orbit: [0.13, 0.18] },
-  { position: [-2.3, -0.55, 0.8], scale: 0.8, orbit: [0.12, 0.16] },
-  { position: [2.15, -0.62, -1], scale: 0.67, orbit: [0.1, 0.14] },
-  { position: [-2.05, -1.23, 1.85], scale: 0.78, orbit: [0.12, 0.18] },
-  { position: [2, -1.16, 1.65], scale: 0.78, orbit: [0.11, 0.17] },
+  { position: [-1.7, 1.95, 1.3], scale: 0.84, orbit: [0.1, 0.16] },
+  { position: [1.65, 1.65, -0.75], scale: 0.68, orbit: [0.08, 0.12] },
+  { position: [-2.25, 0.7, -1.1], scale: 0.66, orbit: [0.1, 0.15] },
+  { position: [2.25, 0.55, 1.25], scale: 0.86, orbit: [0.13, 0.18] },
+  { position: [-2.28, -0.9, 1.5], scale: 0.8, orbit: [0.12, 0.16] },
+  { position: [2.2, -0.82, 1.45], scale: 0.78, orbit: [0.1, 0.14] },
+  { position: [-1.72, -1.9, 2.25], scale: 0.78, orbit: [0.12, 0.18] },
+  { position: [1.75, -1.8, 2.1], scale: 0.78, orbit: [0.11, 0.17] },
 ];
 
 messageCount.textContent = MESSAGES.length;
@@ -698,6 +698,7 @@ function openMessage(index) {
 
     if (openedLetters.size === MESSAGES.length) {
       setTimeout(() => {
+        closeMessage();
         finalHeart.visible = true;
         finalNote.classList.add("is-open");
         finalNote.setAttribute("aria-hidden", "false");
