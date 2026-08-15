@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#09070f" />
+    <title>Một Hộp Nhạc Cho Em</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Noto+Serif:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main class="experience">
+      <canvas
+        id="scene"
+        aria-label="Hộp nhạc sinh nhật trong không gian đầy sao"
+      ></canvas>
+      <div class="letter-hit-layer" id="letterHitLayer" aria-hidden="true"></div>
+
+      <div class="grain" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <p class="eyebrow">GỬI TẶNG TỚI BẠN HÒN KHÉN =))</p>
+        <p class="date" id="today"></p>
+      </header>
+
+      <section class="hud" aria-live="polite">
+        <p class="hint" id="sceneHint">
+          Chạm vào những phong thư đang bay quanh hộp nhạc
+        </p>
+        <div class="message-count">
+          <span id="openedCount">0</span> / <span id="messageCount">8</span>
+        </div>
+      </section>
+
+      <section class="letter-panel" id="letterPanel" aria-hidden="true">
+        <button
+          class="icon-button"
+          id="closeLetter"
+          type="button"
+          aria-label="Đóng lời nhắn"
+        >
+          ×
+        </button>
+        <p class="letter-number" id="letterNumber">LÁ THƯ 01</p>
+        <h1 id="letterTitle"></h1>
+        <p id="letterBody"></p>
+      </section>
+
+      <section class="start-screen" id="startScreen">
+        <div class="start-copy" id="startCopy">
+          <p class="eyebrow">A SMALL UNIVERSE, MADE FOR YOU</p>
+          <h1>Một hộp nhạc<br />cho ngày đặc biệt.</h1>
+          <p class="intro">Mở nó ra, để những vì sao kể giúp anh vài điều.</p>
+          <button class="start-button" id="startButton" type="button" disabled>
+            <span id="startButtonText">Đang chuẩn bị hộp nhạc...</span>
+            <span class="button-mark" aria-hidden="true">↗</span>
+          </button>
+          <p class="loading-text" id="loadingText">Đang tải kỷ niệm 0%</p>
+        </div>
+
+        <form class="password-gate" id="passwordGate" aria-hidden="true" novalidate>
+          <p class="eyebrow">A LITTLE SECRET</p>
+          <h2>Mở khóa hộp nhạc</h2>
+          <div class="password-field">
+            <label for="passwordInput">Mật mã</label>
+            <input
+              id="passwordInput"
+              name="password"
+              type="password"
+              inputmode="numeric"
+              autocomplete="off"
+              maxlength="8"
+              placeholder="••••••••"
+              aria-describedby="passwordHint passwordError"
+            />
+          </div>
+          <p class="password-hint" id="passwordHint">Mật mã là ngày tháng năm sinh của bạn.</p>
+          <p class="password-error" id="passwordError" role="status"></p>
+          <button class="start-button password-submit" type="submit">
+            <span>Mở khóa</span>
+            <span class="button-mark" aria-hidden="true">↗</span>
+          </button>
+        </form>
+      </section>
+
+      <section class="final-note" id="finalNote" aria-hidden="true">
+        <p class="eyebrow">THE LAST LITTLE SECRET</p>
+        <h2>Chúc mừng sinh nhật.</h2>
+        <p>Cảm ơn ní đã làm thế giới của anh trở nên dịu dàng và rực rỡ hơn.</p>
+      </section>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+# Source asset retained locally; GitHub rejects files above 100 MB.
+MainChar.glb
+
+# Local test artifacts.
+.playwright-cli/
+output/
