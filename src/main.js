@@ -66,15 +66,15 @@ const sceneHint = document.querySelector("#sceneHint");
 const BIRTHDAY_DISPLAY = "16 tháng 8, 2026";
 const VALID_PASSWORDS = new Set(["16082004", "16802004", "1682004"]);
 
-const MOBILE_LETTER_POSITIONS = [
-  [-1.16, 2.3, -0.15],
-  [1.18, 2.32, -0.05],
-  [-2.48, 1.18, 0.18],
-  [2.5, 1.08, 0.25],
-  [-2.5, -0.42, 0.34],
-  [2.52, -0.3, 0.28],
-  [-1.82, -1.28, -0.05],
-  [1.87, -1.28, -0.07],
+const MOBILE_LETTER_LAYOUT = [
+  { position: [-1.55, 1.75, 1.15], scale: 0.84, orbit: [0.1, 0.16] },
+  { position: [1.55, 1.45, -0.8], scale: 0.68, orbit: [0.08, 0.12] },
+  { position: [-2.15, 0.55, -1.05], scale: 0.66, orbit: [0.1, 0.15] },
+  { position: [2.18, 0.28, 1.1], scale: 0.86, orbit: [0.13, 0.18] },
+  { position: [-2.3, -0.55, 0.8], scale: 0.8, orbit: [0.12, 0.16] },
+  { position: [2.15, -0.62, -1], scale: 0.67, orbit: [0.1, 0.14] },
+  { position: [-2.05, -1.23, 1.85], scale: 0.78, orbit: [0.12, 0.18] },
+  { position: [2, -1.16, 1.65], scale: 0.78, orbit: [0.11, 0.17] },
 ];
 
 messageCount.textContent = MESSAGES.length;
@@ -552,8 +552,9 @@ function createLetters() {
     hitArea.position.z = 0.035;
     hitArea.userData.index = index;
     envelope.add(hitArea);
+    const mobileLayout = isMobile ? MOBILE_LETTER_LAYOUT[index] : null;
     if (isMobile) {
-      envelope.position.fromArray(MOBILE_LETTER_POSITIONS[index]);
+      envelope.position.fromArray(mobileLayout.position);
     } else {
       const angle = (index / MESSAGES.length) * Math.PI * 2 + 0.35;
       const radius = index % 2 === 0 ? 5.15 : 6.1;
@@ -566,7 +567,9 @@ function createLetters() {
     envelope.userData = {
       index,
       base: envelope.position.clone(),
-      baseScale: isMobile ? 0.8 : 1,
+      baseScale: mobileLayout?.scale ?? 1,
+      orbitX: mobileLayout?.orbit[0] ?? 0,
+      orbitZ: mobileLayout?.orbit[1] ?? 0,
       phase: index * 0.8,
       opened: false,
     };
@@ -909,10 +912,14 @@ function animate(frameTime = 0) {
   }
 
   letters.forEach((letter, index) => {
-    const { base, baseScale, phase, opened } = letter.userData;
+    const { base, baseScale, orbitX, orbitZ, phase, opened } = letter.userData;
     const floatStrength = opened ? 0.09 : 0.17;
+    letter.position.x =
+      base.x + Math.sin(elapsed * 0.52 + phase) * orbitX * drift;
     letter.position.y =
       base.y + Math.sin(elapsed * 0.9 + phase) * floatStrength * drift;
+    letter.position.z =
+      base.z + Math.cos(elapsed * 0.52 + phase) * orbitZ * drift;
     letter.lookAt(camera.position);
     letter.scale.setScalar((opened ? 0.9 : 1) * baseScale);
   });
