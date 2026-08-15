@@ -47,8 +47,8 @@ button {
 
 .letter-hit-target {
   position: absolute;
-  width: 132px;
-  height: 166px;
+  width: 1px;
+  height: 1px;
   margin: 0;
   padding: 0;
   border: 0;
@@ -442,11 +442,6 @@ button {
 @media (max-width: 640px) {
   .reset-button {
     top: 58px;
-  }
-
-  .letter-hit-target {
-    width: 70px;
-    height: 92px;
   }
 
   .topbar {

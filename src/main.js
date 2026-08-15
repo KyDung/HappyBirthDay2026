@@ -147,6 +147,10 @@ const letterHitTargets = [];
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 const projectedLetterPosition = new THREE.Vector3();
+const projectedLetterLeft = new THREE.Vector3();
+const projectedLetterRight = new THREE.Vector3();
+const projectedLetterTop = new THREE.Vector3();
+const projectedLetterBottom = new THREE.Vector3();
 const clock = new THREE.Clock();
 const openedLetters = new Set();
 let running = false;
@@ -859,6 +863,10 @@ function updateLetterHitTargets() {
   letters.forEach((letter, index) => {
     const hitTarget = letterHitTargets[index];
     letter.getWorldPosition(projectedLetterPosition).project(camera);
+    letter.localToWorld(projectedLetterLeft.set(-0.42, 0, 0)).project(camera);
+    letter.localToWorld(projectedLetterRight.set(0.42, 0, 0)).project(camera);
+    letter.localToWorld(projectedLetterTop.set(0, 0.55, 0)).project(camera);
+    letter.localToWorld(projectedLetterBottom.set(0, -0.55, 0)).project(camera);
 
     const visible =
       projectedLetterPosition.z > -1 &&
@@ -871,6 +879,14 @@ function updateLetterHitTargets() {
     hitTarget.hidden = !visible;
     hitTarget.style.left = `${(projectedLetterPosition.x + 1) * rect.width * 0.5}px`;
     hitTarget.style.top = `${(1 - projectedLetterPosition.y) * rect.height * 0.5}px`;
+    hitTarget.style.width = `${Math.max(
+      34,
+      Math.abs(projectedLetterRight.x - projectedLetterLeft.x) * rect.width * 0.52,
+    )}px`;
+    hitTarget.style.height = `${Math.max(
+      48,
+      Math.abs(projectedLetterTop.y - projectedLetterBottom.y) * rect.height * 0.52,
+    )}px`;
     hitTarget.style.transform = "translate(-50%, -50%)";
   });
 }
